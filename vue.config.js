@@ -1,10 +1,13 @@
 const path = require('path')
 
+//http://121.201.93.46:8810/
+const host = "http://192.168.55.1:8080/"
+
 function resolve(dir) {
   return path.join(__dirname, dir)
 }
 module.exports = {
-  publicPath: "/",
+  publicPath: "/screen",
   // 输出文件目录
   outputDir: 'dist',
   lintOnSave: true,
@@ -19,14 +22,14 @@ module.exports = {
   devServer: {
     proxy: {
       "/api": {
-        target: "http://121.201.93.46:8810/",
+        target: host,
         changeOrigin: true,
         pathRewrite: {
           "^/api": "/api"
         }
       },
       "/media": {
-        target: "http://121.201.93.46:8810/",
+        target: host,
         changeOrigin: true,
         pathRewrite: {
           "^/media": "/media"

@@ -121,8 +121,6 @@
               <hr style="margin: 5px 0" />
             </div>
             <iframe class="shipin" src='/api/livestream/play?channelId=0'></iframe>
-            </iframe>
-
           </div>
           <div class="video2">
             <div class="count-title">
@@ -229,7 +227,7 @@
 </template>
 
 <script>
-import { login, monitoring, non_motor } from "../request/api";
+import { login, monitoring, non_motor, pedestrian } from "../request/api";
 export default {
   name: "Index",
   data: () => {
@@ -271,6 +269,9 @@ export default {
 
     this.getnon_motor("entry", null); // 入口 车辆
     this.getnon_motor("exit", null); // 出口 车辆
+
+    this.getPedestrian("entry", null); // 入口 行人
+    this.getPedestrian("exit", null); // 出口 行人
 
     this.curTime = setInterval(() => {
       this.curTime = new Date(); // 修改数据date
@@ -365,7 +366,44 @@ export default {
         }
       });
     },
-
+    getPedestrian(direction, id) {
+      pedestrian({
+        pageNumber: 0,
+        pageSize: 4,
+        location: direction,
+        contentId: id,
+      }).then((res) => {
+        if (res.status == 200 && res.data.list) {
+          if (this.in_car.length == 0 || this.out_car.length == 0) {
+            res.data.list.forEach((v) => {
+              direction == "exit"
+                ? this.out_face.unshift(v)
+                : this.in_face.unshift(v);
+              this.in_face.length > 4
+                ? this.in_face.splice(4, 1)
+                : this.in_face;
+              this.out_face.length > 4
+                ? this.out_face.splice(4, 1)
+                : this.out_face;
+            });
+            direction == "entry"
+            ? (this.in_face_num = res.data.total)
+            : (this.out_face_num = res.data.total);
+          } else if (this.in_face.length > 0 || this.out_face.length > 0) {
+            direction == "exit"
+              ? this.out_face.unshift(res.data.list[0])
+              : this.in_face.unshift(res.data.list[0]);
+            this.in_face.length > 4 ? this.in_face.splice(4, 1) : this.in_face;
+            this.out_face.length > 4
+              ? this.out_face.splice(4, 1)
+              : this.out_face;
+            direction == "entry"
+            ? (this.in_face_num += 1)
+            : (this.out_face_num += 1);
+          }
+        }
+      });
+    },
     // 视频
     // getVideo(direction) {
     //   play({
@@ -391,6 +429,7 @@ export default {
     initWebSocket() {
       //初始化weosocket
       let wsuri = `ws://${location.hostname}:8080/ws/event`;
+      // let wsuri = `ws://192.168.55.1:8080/ws/event`;
       this.websock = new WebSocket(wsuri);
       this.websock.onmessage = this.websocketonmessage;
       // this.websock.onopen = this.websocketonopen;
@@ -413,26 +452,39 @@ export default {
       //数据接收
       let websocketData = JSON.parse(e.data).data;
       if (websocketData) {
+        console.log("event->" + websocketData.type)
         if (
-          websocketData.type == "pedestrian" &&
+          websocketData.type == "face" &&
           websocketData.location == "exit"
         ) {
           // 人脸出口
           this.getFace("exit", websocketData.contentId);
         } else if (
-          websocketData.type == "pedestrian" &&
+          websocketData.type == "face" &&
           websocketData.location == "entry"
         ) {
           // 人脸入口
           this.getFace("entry", websocketData.contentId);
         } else if (
+          websocketData.type == "pedestrian" &&
+          websocketData.location == "exit"
+        ) {
+          // 行人出口
+          this.getPedestrian("exit", websocketData.contentId);
+        } else if (
+          websocketData.type == "pedestrian" &&
+          websocketData.location == "entry"
+        ) {
+          // 行人入口
+          this.getPedestrian("entry", websocketData.contentId);
+        } else if (
           websocketData.type == "non-motor" &&
           websocketData.location == "entry"
         ) {
-          // 电鸡入口
+          // 非机动车入口
           this.getnon_motor("entry", websocketData.contentId); // 入口 车辆
         } else {
-          // 电鸡出口
+          // 非机动车出口
           this.getnon_motor("exit", websocketData.contentId); // 出口 车辆
         }
       }
