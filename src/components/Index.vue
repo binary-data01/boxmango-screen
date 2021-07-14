@@ -15,14 +15,14 @@
       <div class="left">
         <div class="cur-num">
           <div style="padding-left: 20px">
-            <span class="num">{{ in_face_num - out_face_num }}</span
+            <span class="num">{{ in_face_num > out_face_num ? in_face_num - out_face_num : 0 }}</span
             ><span class="unit">人</span>
           </div>
           <div class="text">当前在场人数</div>
         </div>
         <div class="cur-num">
           <div style="padding-left: 20px">
-            <span class="num">{{ in_car_num - out_car_num }}</span
+            <span class="num">{{ in_car_num > out_car_num ? in_car_num - out_car_num : 0 }}</span
             ><span class="unit">辆</span>
           </div>
           <div class="text">当前在场电动车数</div>
@@ -120,7 +120,7 @@
               </div>
               <hr style="margin: 5px 0" />
             </div>
-            <iframe class="shipin" src='/api/livestream/play?channelId=0'></iframe>
+            <iframe class="shipin" src='/api/livestream/play?location=entry'></iframe>
           </div>
           <div class="video2">
             <div class="count-title">
@@ -171,7 +171,7 @@
               </div>
               <hr style="margin: 5px 0" />
             </div>
-            <iframe class="shipin" src='/api/livestream/play?channelId=1'></iframe>
+            <iframe class="shipin" src='/api/livestream/play?location=exit'></iframe>
           </div>
           <div class="video2">
             <div class="count-title">
@@ -301,25 +301,28 @@ export default {
         contentId: id,
       }).then((res) => {
         if (res.status == 200 && res.data.list) {
+
           if (this.in_car.length == 0 || this.out_car.length == 0) {
             res.data.list.forEach((v) => {
-              direction == "entry"
-                ? this.in_car.unshift(v)
-                : this.out_car.unshift(v);
-              this.in_car.length > 4 ? this.in_car.splice(4, 1) : this.in_car;
-              this.out_car.length > 4
-                ? this.out_car.splice(4, 1)
-                : this.out_car;
+              if (direction == "exit" && this.out_car.length < 4) {
+                  this.out_car.push(v)
+              } else if (direction == "entry" && this.in_car.length < 4) {
+                  this.in_car.push(v);
+              }
             });
+
             direction == "entry"
             ? (this.in_car_num = res.data.total)
             : (this.out_car_num = res.data.total);
+
           } else if (this.in_car.length > 0 || this.out_car.length > 0) {
-            direction == "entry"
-              ? this.in_car.unshift(res.data.list[0])
-              : this.out_car.unshift(res.data.list[0]);
-            this.in_car.length > 4 ? this.in_car.splice(4, 1) : this.in_car;
-            this.out_car.length > 4 ? this.out_car.splice(4, 1) : this.out_car;
+            direction == "exit"
+              ? this.in_car.push(res.data.list[0])
+              : this.out_car.push(res.data.list[0]);
+
+            this.in_car.length > 4 ? this.in_car.splice(0, 1) : this.in_car;
+            this.out_car.length > 4 ? this.out_car.splice(0, 1) : this.out_car;
+
             direction == "entry"
             ? (this.in_car_num += 1)
             : (this.out_car_num += 1);
@@ -336,29 +339,28 @@ export default {
         contentId: id,
       }).then((res) => {
         if (res.status == 200 && res.data.list) {
-          if (this.in_car.length == 0 || this.out_car.length == 0) {
+          if (this.in_face.length == 0 || this.out_face.length == 0) {
             res.data.list.forEach((v) => {
-              direction == "exit"
-                ? this.out_face.unshift(v)
-                : this.in_face.unshift(v);
-              this.in_face.length > 4
-                ? this.in_face.splice(4, 1)
-                : this.in_face;
-              this.out_face.length > 4
-                ? this.out_face.splice(4, 1)
-                : this.out_face;
+              if (direction == "exit" && this.out_face.length < 4) {
+                  this.out_face.push(v)
+              } else if (direction == "entry" && this.in_face.length < 4) {
+                  this.in_face.push(v);
+              }
             });
+
             direction == "entry"
             ? (this.in_face_num = res.data.total)
             : (this.out_face_num = res.data.total);
+
           } else if (this.in_face.length > 0 || this.out_face.length > 0) {
+
             direction == "exit"
-              ? this.out_face.unshift(res.data.list[0])
-              : this.in_face.unshift(res.data.list[0]);
-            this.in_face.length > 4 ? this.in_face.splice(4, 1) : this.in_face;
-            this.out_face.length > 4
-              ? this.out_face.splice(4, 1)
-              : this.out_face;
+              ? this.out_face.push(res.data.list[0])
+              : this.in_face.push(res.data.list[0]);
+
+            this.in_face.length > 4 ? this.in_face.splice(0, 1) : this.in_face;
+            this.out_face.length > 4 ? this.out_face.splice(0, 1) : this.out_face;
+
             direction == "entry"
             ? (this.in_face_num += 1)
             : (this.out_face_num += 1);
@@ -374,29 +376,27 @@ export default {
         contentId: id,
       }).then((res) => {
         if (res.status == 200 && res.data.list) {
-          if (this.in_car.length == 0 || this.out_car.length == 0) {
+          if (this.in_face.length == 0 || this.out_face.length == 0) {
             res.data.list.forEach((v) => {
-              direction == "exit"
-                ? this.out_face.unshift(v)
-                : this.in_face.unshift(v);
-              this.in_face.length > 4
-                ? this.in_face.splice(4, 1)
-                : this.in_face;
-              this.out_face.length > 4
-                ? this.out_face.splice(4, 1)
-                : this.out_face;
+              if (direction == "exit" && this.out_face.length < 4) {
+                  this.out_face.push(v)
+              } else if (direction == "entry" && this.in_face.length < 4) {
+                  this.in_face.push(v);
+              }
             });
+
             direction == "entry"
             ? (this.in_face_num = res.data.total)
             : (this.out_face_num = res.data.total);
+
           } else if (this.in_face.length > 0 || this.out_face.length > 0) {
             direction == "exit"
-              ? this.out_face.unshift(res.data.list[0])
-              : this.in_face.unshift(res.data.list[0]);
-            this.in_face.length > 4 ? this.in_face.splice(4, 1) : this.in_face;
-            this.out_face.length > 4
-              ? this.out_face.splice(4, 1)
-              : this.out_face;
+              ? this.out_face.push(res.data.list[0])
+              : this.in_face.push(res.data.list[0]);
+
+            this.in_face.length > 4 ? this.in_face.splice(0, 1) : this.in_face;
+            this.out_face.length > 4 ? this.out_face.splice(0, 1) : this.out_face;
+
             direction == "entry"
             ? (this.in_face_num += 1)
             : (this.out_face_num += 1);
@@ -429,7 +429,7 @@ export default {
     initWebSocket() {
       //初始化weosocket
       let wsuri = `ws://${location.hostname}:8080/ws/event`;
-      // let wsuri = `ws://192.168.55.1:8080/ws/event`;
+      // let wsuri = `ws://192.168.22.192:8080/ws/event`;
       this.websock = new WebSocket(wsuri);
       this.websock.onmessage = this.websocketonmessage;
       // this.websock.onopen = this.websocketonopen;
@@ -496,6 +496,7 @@ export default {
     //关闭
     websocketclose() {
       console.log("websocket断开连接");
+      this.initWebSocket();
     },
 
     getLogin() {

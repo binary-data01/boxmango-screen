@@ -1,7 +1,8 @@
 const path = require('path')
 
 //http://121.201.93.46:8810/
-const host = "http://192.168.55.1:8080/"
+// const host = "http://192.168.55.1:8080/"
+const host = "http://192.168.22.192:8080/"
 
 function resolve(dir) {
   return path.join(__dirname, dir)
