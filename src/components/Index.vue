@@ -317,8 +317,8 @@ export default {
 
           } else if (this.in_car.length > 0 || this.out_car.length > 0) {
             direction == "exit"
-              ? this.in_car.push(res.data.list[0])
-              : this.out_car.push(res.data.list[0]);
+              ? this.out_car.push(res.data.list[0])
+              : this.in_car.push(res.data.list[0]);
 
             this.in_car.length > 4 ? this.in_car.splice(0, 1) : this.in_car;
             this.out_car.length > 4 ? this.out_car.splice(0, 1) : this.out_car;
@@ -483,9 +483,14 @@ export default {
         ) {
           // 非机动车入口
           this.getnon_motor("entry", websocketData.contentId); // 入口 车辆
-        } else {
+        } else if (
+          websocketData.type == "non-motor" &&
+          websocketData.location == "exit"
+        ) {
           // 非机动车出口
           this.getnon_motor("exit", websocketData.contentId); // 出口 车辆
+        } else {
+          console.log("unknow type "+ websocketData.type)
         }
       }
     },
