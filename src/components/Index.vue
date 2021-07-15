@@ -120,7 +120,7 @@
               </div>
               <hr style="margin: 5px 0" />
             </div>
-            <iframe class="shipin" src='/api/livestream/play?location=entry'></iframe>
+            <iframe class="shipin" id="entryIframe" src=''></iframe>
           </div>
           <div class="video2">
             <div class="count-title">
@@ -171,7 +171,7 @@
               </div>
               <hr style="margin: 5px 0" />
             </div>
-            <iframe class="shipin" src='/api/livestream/play?location=exit'></iframe>
+            <iframe class="shipin" id="exitIframe" src=''></iframe>
           </div>
           <div class="video2">
             <div class="count-title">
@@ -227,7 +227,7 @@
 </template>
 
 <script>
-import { login, monitoring, non_motor, pedestrian } from "../request/api";
+import { login, monitoring, non_motor, pedestrian, livestream } from "../request/api";
 export default {
   name: "Index",
   data: () => {
@@ -285,6 +285,9 @@ export default {
 
       this.curTime = `${Y}年${M}月${D}日 ${h}:${m}:${s}`;
     }, 1000);
+
+    this.getLivestream('entry')
+    this.getLivestream('exit')
   },
   beforeDestroy() {
     if (this.timer) {
@@ -404,22 +407,16 @@ export default {
         }
       });
     },
-    // 视频
-    // getVideo(direction) {
-    //   play({
-    //     channelId: direction,
-    //   }).then((res) => {
-    //     if (res.status == 200) {
-    //       document.querySelector('.iframe').contentWindow.document.documentElement.innerHTML = res.data;
-    //       direction == 0 ?
-    //       document.querySelector('.shipin').contentWindow.document.documentElement.innerHTML = res.data :
-    //       document.querySelector('.iframe').contentWindow.document.documentElement.innerHTML = res.data;
-    //       direction == 0
-    //         ? (this.in_videoItem = res.data)
-    //         : (this.out_videoItem = res.data);
-    //     }
-    //   });
-    // },
+    // 实时视频流
+    getLivestream(location) {
+      livestream({
+        location: location,
+      }).then((res) => {
+          console.log("open " + location + " livestream")
+          var ifr = document.querySelector('#' + location + 'Iframe');
+          ifr.srcdoc = res.data
+      });
+    },
     checkTime(i) {
       if (i < 10) {
         i = "0" + i;
@@ -442,11 +439,8 @@ export default {
     //   this.websocketsend(JSON.stringify(actions));
     // },
     websocketonerror() {
-      let that = this;
       //连接建立失败重连
-      setTimeout(() => {
-        that.initWebSocket();
-      }, 5000);
+      console.log("websocket连接失败");
     },
     websocketonmessage(e) {
       //数据接收
@@ -501,7 +495,11 @@ export default {
     //关闭
     websocketclose() {
       console.log("websocket断开连接");
-      this.initWebSocket();
+      setTimeout(()=> {
+        console.log("reload page");
+        location.reload();
+        sessionStorage.removeItem("token");
+      }, 10000)
     },
 
     getLogin() {

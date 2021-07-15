@@ -35,3 +35,11 @@ export function pedestrian(data) {    // pageNumber=0&pageSize=10&location=
         params: data
     })
 }
+
+export function livestream(data) {
+    return servie({
+        url: '/livestream/play',
+        method: 'get',
+        params: data,
+    })
+}
