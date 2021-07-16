@@ -413,8 +413,17 @@ export default {
         location: location,
       }).then((res) => {
           console.log("open " + location + " livestream")
-          var ifr = document.querySelector('#' + location + 'Iframe');
-          ifr.srcdoc = res.data
+          var ifr = document.getElementById(location + 'Iframe');
+          ifr.srcdoc = res.data;
+          ifr.onload = function() {
+            console.log("Location " + location + " livestrame started");
+            var exitIframe = document.getElementById('exitIframe');
+            var entryIframe = document.getElementById('entryIframe');
+            var exitVideo = exitIframe.contentWindow.document.getElementById('videoElem');
+            var entryVideo = entryIframe.contentWindow.document.getElementById('videoElem');
+            exitVideo.setAttribute("style", "width:" + exitIframe.clientWidth + "px;height:" + exitIframe.clientHeight + "px;object-fit:fill;");
+            entryVideo.setAttribute("style", "width:" + entryIframe.clientWidth + "px;height:" + entryIframe.clientHeight + "px;object-fit:fill;");
+          };
       });
     },
     checkTime(i) {
