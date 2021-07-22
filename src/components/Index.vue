@@ -120,7 +120,7 @@
               </div>
               <hr style="margin: 5px 0" />
             </div>
-            <iframe class="shipin" id="entryIframe" src=''></iframe>
+            <iframe class="shipin" style="margin:0px;padding:0px;" id="entryIframe" src=''></iframe>
           </div>
           <div class="video2">
             <div class="count-title">
@@ -171,7 +171,7 @@
               </div>
               <hr style="margin: 5px 0" />
             </div>
-            <iframe class="shipin" id="exitIframe" src=''></iframe>
+            <iframe class="shipin" style="margin:0px;padding:0px;" id="exitIframe" src=''></iframe>
           </div>
           <div class="video2">
             <div class="count-title">
@@ -421,8 +421,8 @@ export default {
             var entryIframe = document.getElementById('entryIframe');
             var exitVideo = exitIframe.contentWindow.document.getElementById('videoElem');
             var entryVideo = entryIframe.contentWindow.document.getElementById('videoElem');
-            exitVideo.setAttribute("style", "width:" + exitIframe.clientWidth + "px;height:" + exitIframe.clientHeight + "px;object-fit:fill;");
-            entryVideo.setAttribute("style", "width:" + entryIframe.clientWidth + "px;height:" + entryIframe.clientHeight + "px;object-fit:fill;");
+            exitVideo.setAttribute("style", "margin:0px;padding:0px;width:" + exitIframe.clientWidth + "px;height:" + exitIframe.clientHeight + "px;object-fit:fill;");
+            entryVideo.setAttribute("style", "margin:0px;padding:0px;width:" + entryIframe.clientWidth + "px;height:" + entryIframe.clientHeight + "px;object-fit:fill;");
           };
       });
     },
