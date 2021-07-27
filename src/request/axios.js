@@ -1,9 +1,10 @@
 import axios from 'axios'
+import { login } from "../request/api";
 
 // axios.defaults.baseURL = 'http://192.168.31.38:3000'
 
 const servie = axios.create({
-    baseURL: "/api",
+    baseURL: "/",
     // timeout: 5000
 });
 
@@ -23,6 +24,25 @@ servie.interceptors.request.use(function (config) {
     // 对请求错误做些什么
     return Promise.reject(error);
 });
+
+servie.interceptors.response.use(function (response) {
+    // 对响应数据做点什么
+    if(response.data.code == '20012') {
+        login({
+            userName: "admin",
+            password: "abc123",
+        }).then((res) => {
+            if (res.status == 200) {
+            sessionStorage.setItem("token", `Bearer ${res.data.token}`);
+            location.reload();
+            }
+        });
+    }
+    return response;
+  }, function (error) {
+    // 对响应错误做点什么
+    return Promise.reject(error);
+  });
 
 // 暴露axios
 export default servie;
